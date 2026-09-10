@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HabitForge - Software Design Document (DA-2)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  @page {
+    size: A4 portrait;
+    margin: 8mm 14mm 8mm 14mm;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #0f172a;
+    background-color: #ffffff;
+    font-size: 9pt;
+    line-height: 1.38;
+  }
+
+  .page {
+    width: 100%;
+    height: 280mm;
+    max-height: 280mm;
+    page-break-after: always;
+    page-break-inside: avoid;
+    position: relative;
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .page:last-child {
+    page-break-after: avoid;
+  }
+
+  .page-content {
+    flex: 1;
+  }
+
+  .running-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #0284c7;
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+    font-size: 8.5pt;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .running-header .doc-title {
+    color: #0369a1;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .running-footer {
+    border-top: 1px solid #cbd5e1;
+    padding-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8pt;
+    color: #64748b;
+  }
+
+  .page-num {
+    font-weight: 700;
+    color: #0284c7;
+  }
+
+  h1.cover-title {
+    font-size: 22pt;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  h2.section-heading {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #0369a1;
+    border-left: 4px solid #0284c7;
+    padding-left: 8px;
+    margin-top: 8px;
+    margin-bottom: 5px;
+  }
+
+  h3.subsection-heading {
+    font-size: 9.8pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 5px;
+    margin-bottom: 3px;
+  }
+
+  p {
+    margin-bottom: 4px;
+    text-align: justify;
+  }
+
+  .info-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 5px;
+    padding: 7px 11px;
+    margin-bottom: 6px;
+    font-size: 8.5pt;
+  }
+
+  .alert-box {
+    background: #f8fafc;
+    border-left: 3.5px solid #0ea5e9;
+    padding: 6px 10px;
+    margin-bottom: 5px;
+    font-size: 8.5pt;
+  }
+
+  pre.code-block {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 7.2pt;
+    line-height: 1.30;
+    margin-bottom: 6px;
+    border: 1px solid #334155;
+  }
+
+  .code-keyword { color: #f43f5e; font-weight: 600; }
+  .code-type { color: #38bdf8; }
+  .code-annotation { color: #fbbf24; }
+  .code-comment { color: #94a3b8; font-style: italic; }
+  .code-string { color: #4ade80; }
+
+  table.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 5px 0;
+    font-size: 8pt;
+  }
+
+  table.custom-table th {
+    background: #0f172a;
+    color: #ffffff;
+    text-align: left;
+    padding: 5px 7px;
+    font-weight: 600;
+  }
+
+  table.custom-table td {
+    padding: 5px 7px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+
+  table.custom-table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  .diagram-container {
+    text-align: center;
+    margin: 4px 0;
+  }
+
+  .diagram-container img {
+    max-width: 100%;
+    max-height: 135mm;
+    border-radius: 5px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .diagram-caption {
+    font-size: 7.2pt;
+    color: #64748b;
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .ui-screen-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 4px;
+    margin-bottom: 4px;
+  }
+
+  .ui-screen-card img {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .ui-screen-card .screen-desc {
+    font-size: 7.4pt;
+    margin-top: 3px;
+    color: #334155;
+    line-height: 1.30;
+  }
+
+  .ui-screen-card .screen-title {
+    font-size: 8pt;
+    font-weight: 700;
+    color: #0369a1;
+  }
+
+  .cover-header {
+    text-align: center;
+    border-bottom: 2px solid #0369a1;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+
+  .vit-badge {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #0369a1;
+    letter-spacing: 0.8px;
+  }
+
+  .vit-sub {
+    font-size: 8.8pt;
+    color: #475569;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .student-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 9px 13px;
+    margin: 10px 0;
+    font-size: 8.8pt;
+  }
+
+  .student-meta-grid div {
+    margin: 2px 0;
+  }
+
+  .badge-tag {
+    display: inline-block;
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 7.2pt;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: COVER & EXECUTIVE OVERVIEW -->
+<div class="page">
+  <div class="page-content">
+    <div class="cover-header">
+      <div class="vit-badge">VELLORE INSTITUTE OF TECHNOLOGY (VIT CHENNAI)</div>
+      <div class="vit-sub">School of Computer Science and Engineering &bull; Software Engineering</div>
+    </div>
+
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 14px;">
+      <span class="badge-tag">Digital Assignment 2 &bull; Review 2</span>
+      <h1 class="cover-title" style="margin-top: 8px;">SOFTWARE DESIGN DOCUMENT</h1>
+      <div style="font-size: 12.5pt; font-weight: 600; color: #0284c7;">HabitForge: Gamified Habit-Tracking Web Application</div>
+      <div style="font-size: 8.5pt; color: #64748b; margin-top: 3px;">Translating Requirements & Wireframes into Layered Object-Oriented Architecture</div>
+    </div>
+
+    <div class="student-meta-grid">
+      <div><strong>Student Name:</strong> Yashmit Sharma</div>
+      <div><strong>Registration No:</strong> 24BAI1348</div>
+      <div><strong>Course:</strong> Software Engineering</div>
+      <div><strong>Architecture Style:</strong> 3-Tier Layered Client-Server (RESTful)</div>
+      <div><strong>GitHub Repository:</strong> <a href="https://github.com/yashmit2812/HabitForge" style="color:#0284c7; text-decoration:none;">github.com/yashmit2812/HabitForge</a></div>
+      <div><strong>Figma Prototype:</strong> <a href="https://www.figma.com/proto/habitforge-v2-system-design" style="color:#0284c7; text-decoration:none;">HabitForge System Design Prototype</a></div>
+    </div>
+
+    <h2 class="section-heading">Executive Summary & Project Context</h2>
+    <p>
+      In Digital Assignment 1 (DA-1), <strong>HabitForge</strong> established its foundational vision document, 25 user stories across 6 functional epics, MoSCoW feature prioritization, initial wireframes, and Docker orchestration. Traditional habit trackers struggle with high abandonment rates because dry checklists fail to deliver immediate feedback or consequences. HabitForge overcomes this behavioral bottleneck by introducing RPG (Role-Playing Game) mechanics?converting daily habits into quests where players gain Experience Points (XP) and Gold to level up, but suffer Health Point (HP) loss if daily habits are abandoned by midnight.
+    </p>
+
+    <h2 class="section-heading">Scope of Digital Assignment 2 (Review 2)</h2>
+    <p>
+      This Software Design Document formalizes the structural and visual design of HabitForge:
+    </p>
+    <ul style="margin-left: 18px; font-size: 8.8pt; margin-bottom: 8px; line-height: 1.42;">
+      <li><strong>1. Design Principles Applied:</strong> Concrete implementation of Abstraction, Modularity, High Cohesion, and Low Coupling across Spring Boot and React codebases, complete with verified code snippets.</li>
+      <li><strong>2. High-Level System Architecture:</strong> Formal 3-Tier Layered Architecture topology modeled in Draw.io, accompanied by complete component interaction and UML class diagrams.</li>
+      <li><strong>3. User Interface Design:</strong> 6 high-fidelity Figma screen mockups demonstrating Fitts's Law compliance, cognitive load minimization, loss-aversion loops, and WCAG accessibility.</li>
+      <li><strong>4. Architectural Trade-offs & Decisions:</strong> Exhaustive technical justification of 5 key design choices comparing selected patterns against rejected alternatives.</li>
+      <li><strong>5. Maintainability & Repository Verification:</strong> Extensibility for mobile apps, multiplayer raids, CI/CD automated test suites, and GitHub directory structure.</li>
+    </ul>
+
+    <div class="info-box">
+      <strong>Core Architectural Goal:</strong> Deliver a zero-coupling system where the React Vite frontend, Spring Boot domain engine, and MongoDB persistence layer communicate strictly through abstract contracts, allowing any subsystem to be scaled, refactored, or replaced without breaking the application.
+    </div>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 1 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 2: DESIGN PRINCIPLES (ABSTRACTION & MODULARITY) -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>1. Design Principles: Abstraction & Modularity</span>
+    </div>
+
+    <h2 class="section-heading">1. Design Principles Applied</h2>
+    <p>
+      High-quality software architecture is grounded in four fundamental design principles: <strong>Abstraction, Modularity, High Cohesion, and Low Coupling</strong>. HabitForge implements these principles across both backend and frontend layers.
+    </p>
+
+    <h3 class="subsection-heading">A. Abstraction (Hiding Complexity Behind Defined Contracts)</h3>
+    <p>
+      Abstraction guarantees that components interact through high-level functional contracts rather than brittle low-level implementations. In HabitForge:
+    </p>
+    <ul style="margin-left: 18px; font-size: 8.5pt; margin-bottom: 5px;">
+      <li><strong>Interface Contracts:</strong> Operations are exposed through Java interfaces like <code>HabitService</code> and <code>StreakStrategy</code>. Callers are unaware of whether data is stored in MongoDB or an in-memory cache.</li>
+      <li><strong>Data Transfer Object (DTO) Boundary:</strong> Entities are never exposed directly to REST clients. <code>HabitRequestDto</code> and <code>HabitResponseDto</code> abstract API payloads, preventing clients from spoofing internal streak attributes.</li>
+    </ul>
+
+    <pre class="code-block"><span class="code-comment">// HabitService.java - Business Interface Contract (Abstraction)</span>
+<span class="code-keyword">package</span> com.example.HabitForge.service;
+
+<span class="code-keyword">public interface</span> <span class="code-type">HabitService</span> {
+    <span class="code-type">HabitResponseDto</span> createHabit(<span class="code-type">String</span> userId, <span class="code-type">HabitRequestDto</span> request);
+    <span class="code-type">HabitResponseDto</span> completeHabit(<span class="code-type">String</span> habitId, <span class="code-type">String</span> userId);
+    <span class="code-type">List</span>&lt;<span class="code-type">HabitResponseDto</span>&gt; getUserHabits(<span class="code-type">String</span> userId);
+    <span class="code-keyword">void</span> deleteHabit(<span class="code-type">String</span> habitId);
+}
+
+<span class="code-comment">// StreakStrategy.java - Strategy Pattern Interface</span>
+<span class="code-keyword">public interface</span> <span class="code-type">StreakStrategy</span> {
+    <span class="code-keyword">int</span> calculateNewStreak(<span class="code-type">Habit</span> habit, <span class="code-type">LocalDate</span> completionDate);
+    <span class="code-keyword">boolean</span> isStreakBroken(<span class="code-type">Habit</span> habit, <span class="code-type">LocalDate</span> currentDate);
+}</pre>
+
+    <h3 class="subsection-heading">B. Modularity (Autonomous, Reusable Functional Units)</h3>
+    <p>
+      Modularity decomposes the system into loosely coupled packages that can be modified, tested, and deployed independently:
+    </p>
+    <div class="grid-2" style="font-size: 8.2pt; margin-bottom: 5px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 5px 8px; border-radius: 4px;">
+        <strong>Backend Spring Boot Modules:</strong>
+        <ul style="margin-left: 14px; margin-top: 2px;">
+          <li><code>controller</code>: REST endpoint mapping & HTTP status codes.</li>
+          <li><code>service</code>: Domain business rules & gamification logic.</li>
+          <li><code>strategy</code>: Swappable streak evaluation engines.</li>
+          <li><code>repository</code>: Data access abstraction layer.</li>
+        </ul>
+      </div>
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 5px 8px; border-radius: 4px;">
+        <strong>Frontend React Modules:</strong>
+        <ul style="margin-left: 14px; margin-top: 2px;">
+          <li><code>components/QuestBoard.jsx</code>: Main habit listing view.</li>
+          <li><code>components/HeroStats.jsx</code>: HP/XP progression bars.</li>
+          <li><code>components/HabitCard.jsx</code>: Individual quest item card.</li>
+          <li><code>services/habitService.js</code>: Isolated REST client.</li>
+        </ul>
+      </div>
+    </div>
+
+    <pre class="code-block"><span class="code-comment">// frontend/src/services/habitService.js - Modular REST API Client</span>
+<span class="code-keyword">const</span> API_BASE = <span class="code-string">'/api'</span>;
+<span class="code-keyword">export const</span> habitService = {
+  <span class="code-keyword">async</span> getHabits(userId = <span class="code-string">'user-default'</span>) {
+    <span class="code-keyword">const</span> res = <span class="code-keyword">await</span> fetch(`${API_BASE}/habits?userId=${userId}`);
+    <span class="code-keyword">if</span> (!res.ok) <span class="code-keyword">throw new</span> Error(<span class="code-string">'Failed to fetch quests'</span>);
+    <span class="code-keyword">return</span> res.json();
+  },
+  <span class="code-keyword">async</span> completeHabit(habitId, userId = <span class="code-string">'user-default'</span>) {
+    <span class="code-keyword">const</span> res = <span class="code-keyword">await</span> fetch(`${API_BASE}/habits/${habitId}/complete?userId=${userId}`, { method: <span class="code-string">'POST'</span> });
+    <span class="code-keyword">return</span> res.json();
+  }
+};</pre>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 2 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 3: DESIGN PRINCIPLES (COHESION & COUPLING) -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>1. Design Principles: High Cohesion & Low Coupling</span>
+    </div>
+
+    <h3 class="subsection-heading">C. High Cohesion (Single Responsibility Principle)</h3>
+    <p>
+      Cohesion measures how tightly bound the internal tasks of a module are. High cohesion guarantees that each class has only <em>one reason to change</em>:
+    </p>
+    <ul style="margin-left: 18px; font-size: 8.5pt; margin-bottom: 5px;">
+      <li><code>StreakCalculationService</code>: Dedicated solely to tracking consecutive completion dates, streak increments, and midnight streak breaks. It never processes HTTP requests or user passwords.</li>
+      <li><code>GamificationService</code>: Dedicated solely to RPG health calculations, gold rewards, and leveling algorithms.</li>
+      <li><code>HabitController</code>: Dedicated solely to HTTP transport concerns: JSON validation, status codes, and routing.</li>
+    </ul>
+
+    <pre class="code-block"><span class="code-comment">// StreakCalculationService.java - Highly Cohesive Domain Service</span>
+<span class="code-annotation">@Service</span>
+<span class="code-keyword">public class</span> <span class="code-type">StreakCalculationService</span> {
+    <span class="code-keyword">private final</span> <span class="code-type">StreakStrategy</span> streakStrategy;
+
+    <span class="code-annotation">@Autowired</span>
+    <span class="code-keyword">public</span> StreakCalculationService(<span class="code-type">StreakStrategy</span> streakStrategy) {
+        <span class="code-keyword">this</span>.streakStrategy = streakStrategy;
+    }
+
+    <span class="code-keyword">public void</span> processHabitCompletion(<span class="code-type">Habit</span> habit, <span class="code-type">LocalDate</span> date) {
+        <span class="code-keyword">int</span> updatedStreak = streakStrategy.calculateNewStreak(habit, date);
+        habit.setCurrentStreak(updatedStreak);
+        <span class="code-keyword">if</span> (updatedStreak > habit.getLongestStreak()) {
+            habit.setLongestStreak(updatedStreak);
+        }
+        habit.setCompletedToday(<span class="code-keyword">true</span>);
+        habit.setLastCompletedDate(date);
+    }
+}</pre>
+
+    <h3 class="subsection-heading">D. Low Coupling (Inversion of Control & Loose Service Dependencies)</h3>
+    <p>
+      Coupling measures interdependencies between modules. Tight coupling produces fragile code where changes cascade uncontrollably. HabitForge guarantees <strong>Low Coupling</strong> through:
+    </p>
+    <ul style="margin-left: 18px; font-size: 8.5pt; margin-bottom: 5px;">
+      <li><strong>Constructor Dependency Injection:</strong> Services never instantiate concrete dependencies with <code>new</code>. The Spring IoC container injects abstractions dynamically at runtime.</li>
+      <li><strong>Stateless REST Communication:</strong> The frontend and backend communicate exclusively over standard JSON HTTP contracts, eliminating binary dependencies between Java and JavaScript.</li>
+    </ul>
+
+    <pre class="code-block"><span class="code-comment">// HabitServiceImpl.java - Loosely Coupled via Constructor Dependency Injection</span>
+<span class="code-annotation">@Service</span>
+<span class="code-keyword">public class</span> <span class="code-type">HabitServiceImpl</span> <span class="code-keyword">implements</span> <span class="code-type">HabitService</span> {
+    <span class="code-keyword">private final</span> <span class="code-type">HabitRepository</span> habitRepository;
+    <span class="code-keyword">private final</span> <span class="code-type">StreakCalculationService</span> streakCalculationService;
+    <span class="code-keyword">private final</span> <span class="code-type">GamificationService</span> gamificationService;
+
+    <span class="code-annotation">@Autowired</span>
+    <span class="code-keyword">public</span> HabitServiceImpl(<span class="code-type">HabitRepository</span> habitRepository,
+                            <span class="code-type">StreakCalculationService</span> streakCalculationService,
+                            <span class="code-type">GamificationService</span> gamificationService) {
+        <span class="code-keyword">this</span>.habitRepository = habitRepository;
+        <span class="code-keyword">this</span>.streakCalculationService = streakCalculationService;
+        <span class="code-keyword">this</span>.gamificationService = gamificationService;
+    }
+
+    <span class="code-annotation">@Override</span>
+    <span class="code-keyword">public</span> <span class="code-type">HabitResponseDto</span> completeHabit(<span class="code-type">String</span> habitId, <span class="code-type">String</span> userId) {
+        <span class="code-type">Habit</span> habit = habitRepository.findById(habitId).orElseThrow();
+        <span class="code-keyword">if</span> (!habit.isCompletedToday()) {
+            streakCalculationService.processHabitCompletion(habit, <span class="code-type">LocalDate</span>.now());
+            habitRepository.save(habit);
+            gamificationService.awardHabitRewards(userId, habit.getXpReward());
+        }
+        <span class="code-keyword">return</span> mapToDto(habit);
+    }
+}</pre>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 3 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 4: HIGH-LEVEL ARCHITECTURE & DRAW.IO DIAGRAM -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>2. High-Level System Architecture</span>
+    </div>
+
+    <h2 class="section-heading">2. High-Level Architecture</h2>
+    <p>
+      HabitForge implements a <strong>3-Tier Layered Client-Server Architecture</strong> orchestrated via Docker Compose. The system is segregated into three distinct tiers:
+    </p>
+
+    <div class="diagram-container">
+      <img src="../docs/design/habitforge_architecture.png" alt="HabitForge High-Level Architecture">
+      <div class="diagram-caption">Figure 2.1: Updated HabitForge High-Level Layered System Architecture Diagram (Draw.io source)</div>
+    </div>
+
+    <h3 class="subsection-heading">Architectural Style Selected & Engineering Rationale</h3>
+    <p>
+      We selected the <strong>3-Tier Layered Client-Server Architectural Style</strong> over monolithic server-rendered MVC or event-driven microservices for several strategic reasons:
+    </p>
+    <ol style="margin-left: 20px; font-size: 8.4pt; line-height: 1.40;">
+      <li><strong>Strict Separation of Concerns:</strong> Visual presentation (React), gamification business rules (Spring Boot), and persistence (MongoDB) run in isolated containers. Changes to UI themes never risk corrupting streak algorithms.</li>
+      <li><strong>Independent Scalability:</strong> The static React Vite application can be deployed to global edge CDNs (Cloudflare/Vercel) while backend computing clusters scale independently to handle peak midnight cron loads.</li>
+      <li><strong>Multi-Client Support:</strong> The Spring Boot API exposes pure stateless JSON endpoints. Developing native mobile apps (iOS/Android in Flutter or React Native) requires zero backend changes.</li>
+      <li><strong>Infrastructure Parity (Docker Compose):</strong> Multi-container orchestration standardizes ports, volumes, and networks (<code>seproject_default</code>) across developer workstations and production servers.</li>
+    </ol>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 4 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 5: COMPONENT FLOW & UML CLASS DIAGRAM -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>2. Architectural Component Flow & Class Modeling</span>
+    </div>
+
+    <h3 class="subsection-heading">A. Data Flow & Component Interaction</h3>
+    <p>
+      The sequence below traces the execution lifecycle when an adventurer checks off a completed quest:
+    </p>
+
+    <div class="diagram-container">
+      <img src="../docs/design/habitforge_component_flow.png" style="max-height: 88mm;" alt="HabitForge Component Flow">
+      <div class="diagram-caption">Figure 2.2: Component Modularity, Cohesion & Loose Coupling Flow (Draw.io source)</div>
+    </div>
+
+    <h3 class="subsection-heading">B. UML Class & Abstraction Architecture</h3>
+    <p>
+      The class diagram below demonstrates how the <strong>Strategy Pattern</strong> decouples streak calculation algorithms from core habit lifecycle management:
+    </p>
+
+    <div class="diagram-container">
+      <img src="../docs/design/habitforge_class_diagram.png" style="max-height: 88mm;" alt="HabitForge UML Class Diagram">
+      <div class="diagram-caption">Figure 2.3: UML Class Diagram Illustrating Interfaces, DTOs, and Strategy Pattern</div>
+    </div>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 5 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 6: UI DESIGN (SCREENS 1, 2, 3) -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>3. User Interface Design: Core Quests & Hero Profile</span>
+    </div>
+
+    <h2 class="section-heading">3. User Interface Design (6 Figma Screens)</h2>
+    <p>
+      The user interface evolves the wireframes from DA-1 into high-fidelity screens utilizing an Obsidian Dark RPG visual language designed to maximize dopamine reward feedback and reduce visual fatigue.
+    </p>
+
+    <div class="grid-2">
+      <!-- Screen 1 -->
+      <div class="ui-screen-card">
+        <div class="screen-title">Screen 1: Daily Quest Board (Dashboard)</div>
+        <img src="../docs/design/screens/screen1_quest_board.png" alt="Screen 1: Daily Quest Board">
+        <div class="screen-desc">
+          <strong>User-Friendly Rationale:</strong> Central execution cockpit. Prominent HP gauge (crimson) and XP gauge (amber) provide instant status. Habits are chunked by Morning, Afternoon, and Evening to eliminate cognitive overload. Large check-off buttons provide instant tactile feedback.
+        </div>
+      </div>
+
+      <!-- Screen 2 -->
+      <div class="ui-screen-card">
+        <div class="screen-title">Screen 2: Quest Creator Modal</div>
+        <img src="../docs/design/screens/screen2_create_habit.png" alt="Screen 2: Quest Creator Modal">
+        <div class="screen-desc">
+          <strong>User-Friendly Rationale:</strong> Simplifies task creation through progressive disclosure. Users tune risk/reward stakes across 4 presets: Easy, Medium, Hard, Boss. HP penalties and XP rewards recalculate live, making consequences explicit prior to saving.
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-screen-card" style="margin-top: 4px;">
+      <div class="screen-title">Screen 3: Hero Profile & RPG Discipline Attributes</div>
+      <img src="../docs/design/screens/screen3_hero_profile.png" style="max-height: 78mm; width: auto; display: block; margin: 0 auto;" alt="Screen 3: Hero Profile">
+      <div class="screen-desc">
+        <strong>User-Friendly Rationale:</strong> Connects real-life daily consistency with virtual RPG character prestige. Displays discipline attributes (Intellect, Endurance, Mindfulness, Consistency) and unlockable milestone badges (7-Day Spark, Iron Body).
+      </div>
+    </div>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 6 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 7: UI DESIGN (SCREENS 4, 5, 6) -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>3. User Interface Design: Analytics, Bazaar & Social Guild</span>
+    </div>
+
+    <div class="grid-2">
+      <!-- Screen 4 -->
+      <div class="ui-screen-card">
+        <div class="screen-title">Screen 4: Streak Analytics & Consistency Heatmap</div>
+        <img src="../docs/design/screens/screen4_analytics_heatmap.png" alt="Screen 4: Streak Analytics">
+        <div class="screen-desc">
+          <strong>User-Friendly Rationale:</strong> Validates user progress through visual proof. Features an annual 52-week GitHub-style activity heatmap alongside monthly consistency bar charts, turning routine tracking into a visual achievement.
+        </div>
+      </div>
+
+      <!-- Screen 5 -->
+      <div class="ui-screen-card">
+        <div class="screen-title">Screen 5: The Item Bazaar (Reward Shop)</div>
+        <img src="../docs/design/screens/screen5_reward_shop.png" alt="Screen 5: The Item Bazaar">
+        <div class="screen-desc">
+          <strong>User-Friendly Rationale:</strong> Delivers tangible extrinsic motivation. Users exchange earned gold for guilt-free real-world rewards (e.g., gaming hours, cheat meal). Items display clear price tags and affordability states.
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-screen-card" style="margin-top: 4px;">
+      <div class="screen-title">Screen 6: Adventurer's Guild & Social Feed</div>
+      <img src="../docs/design/screens/screen6_guild_social.png" style="max-height: 78mm; width: auto; display: block; margin: 0 auto;" alt="Screen 6: Adventurer's Guild">
+      <div class="screen-desc">
+        <strong>User-Friendly Rationale:</strong> Social accountability engine. Introduces cooperative Party Boss Raids ("The Procrastination Dragon") where completed member habits deal collective boss damage. Activity feed allows teammates to send +5 XP Cheers.
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-top: 4px; font-size: 8pt;">
+      <strong>Fitts's Law & Accessibility Heuristics:</strong> Primary interactive elements feature touch targets >44px height aligned to standard thumb interaction arcs. High color contrast ratios (>7:1) guarantee WCAG 2.1 AA compliance across light and dark modes.
+    </div>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 7 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 8: KEY DESIGN DECISIONS -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>4. Design Decisions & Technical Trade-offs</span>
+    </div>
+
+    <h2 class="section-heading">4. Key Design Decisions & Why</h2>
+    <p>
+      High-reliability engineering requires balancing trade-offs between speed, maintainability, and scalability. Below is an analysis of the 5 key architectural decisions made in HabitForge:
+    </p>
+
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Decision</th>
+          <th style="width: 35%;">Choice Selected & Rationale</th>
+          <th style="width: 40%;">Alternative Rejected & Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Client Rendering Architecture</strong></td>
+          <td><strong>React 18 + Vite (SPA):</strong> Sub-100ms client route transitions and instantaneous optimistic UI checkoffs. Vital for gamified tactile feedback.</td>
+          <td><strong>Multi-Page MVC (Thymeleaf/JSP):</strong> Full-page browser refreshes break player immersion and make animated progress gauges feel sluggish.</td>
+        </tr>
+        <tr>
+          <td><strong>2. Backend Layering & Separation</strong></td>
+          <td><strong>Controller-Service-Repository with DTOs:</strong> Strict boundaries prevent database leakage and allow isolated unit testing.</td>
+          <td><strong>Flat Controller-Entity Architecture:</strong> Direct binding of database models to HTTP endpoints creates critical security vulnerabilities.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Database Paradigm</strong></td>
+          <td><strong>Document NoSQL (MongoDB):</strong> Habit objects have variable metadata (schedules, check-in history, badges) that map naturally to JSON documents.</td>
+          <td><strong>Strict Relational SQL (PostgreSQL):</strong> Requires complex multi-table joins for simple daily check-in evaluations and schema migrations.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Health Penalty Synchronization</strong></td>
+          <td><strong>Server-Authoritative Midnight Cron:</strong> Backend <code>@Scheduled</code> task deducts HP and resets streaks at 23:59:59 server time.</td>
+          <td><strong>Client-Triggered Local Evaluation:</strong> Relying on client clocks allows users to manipulate device time to bypass health penalties and fake streaks.</td>
+        </tr>
+        <tr>
+          <td><strong>5. Session & Auth Architecture</strong></td>
+          <td><strong>Stateless JWT (JSON Web Tokens):</strong> Self-contained signed tokens allow the Spring Boot API to scale horizontally without session clustering.</td>
+          <td><strong>Server-Side Stateful Sessions:</strong> Storing session states in server RAM creates single points of failure and complicates cloud redeployments.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="subsection-heading">Maintainability & Technical Debt Mitigation</h3>
+    <p>
+      By implementing the <strong>Strategy Pattern</strong> for streak evaluation (<code>StreakStrategy</code>), we satisfy the Open/Closed Principle: new streak rules (such as weekend exemptions or illness freezes) can be introduced as new strategy classes without modifying core habit services.
+    </p>
+    <div class="alert-box">
+      <strong>Persistence Decoupling:</strong> The repository layer is encapsulated behind the <code>HabitRepository</code> interface. If storage demands exceed single-instance MongoDB capacity, the persistence engine can be swapped for a distributed cluster without modifying controller or service logic.
+    </div>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 8 of 9</span>
+  </div>
+</div>
+
+<!-- PAGE 9: ROADMAP, REPO & VERIFICATION -->
+<div class="page">
+  <div class="page-content">
+    <div class="running-header">
+      <span class="doc-title">Software Design Document &bull; DA-2</span>
+      <span>5. Maintainability, Future Roadmap & Verification</span>
+    </div>
+
+    <h2 class="section-heading">5. Future Scope & Roadmap</h2>
+    <div class="grid-2" style="font-size: 8.2pt; margin-bottom: 5px;">
+      <div class="info-box">
+        <strong>Phase 3: Native Mobile Apps (Flutter/React Native)</strong>
+        <p style="margin-top: 3px;">
+          Because our Spring Boot backend exposes pure stateless RESTful JSON contracts, creating native mobile applications in Flutter or React Native requires zero backend refactoring. Both clients will consume the identical <code>/api/habits</code> endpoints.
+        </p>
+      </div>
+      <div class="info-box">
+        <strong>Phase 4: Real-Time Guild Multiplayer</strong>
+        <p style="margin-top: 3px;">
+          Extending the Adventurer's Guild with real-time party boss raids via <strong>WebSockets (STOMP protocol)</strong>. Teammates will see real-time damage inflicted on party bosses the instant a friend completes a habit in the real world.
+        </p>
+      </div>
+    </div>
+
+    <h2 class="section-heading">6. GitHub Repository Structure & Deliverables Verification</h2>
+    <p>
+      All DA-2 design artifacts, editable Draw.io source diagrams, rendered high-resolution exports, and updated codebases are organized in the official repository:
+    </p>
+
+    <div style="background: #0f172a; color: #f8fafc; padding: 6px 9px; border-radius: 5px; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 7.2pt; margin-bottom: 5px;">
+      HabitForge/<br>
+      &boxur;&boxh;&boxh; README.md &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#38bdf8;">[Updated with Software Design DA-2 Section]</span><br>
+      &boxur;&boxh;&boxh; docker-compose.yml &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#94a3b8;">[Multi-container orchestration]</span><br>
+      &boxur;&boxh;&boxh; docs/design/<br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; habitforge_architecture.drawio &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#4ade80;">[Editable Draw.io XML Source]</span><br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; habitforge_architecture.png &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#fbbf24;">[High-Res System Architecture PNG]</span><br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; habitforge_component_flow.drawio &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#4ade80;">[Editable Component Modularity XML]</span><br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; habitforge_component_flow.png &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#fbbf24;">[High-Res Component Flow PNG]</span><br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; habitforge_class_diagram.drawio &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#4ade80;">[Editable UML Class Diagram XML]</span><br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; habitforge_class_diagram.png &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#fbbf24;">[High-Res UML Class Diagram PNG]</span><br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; FIGMA_PROTOTYPE.md &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#38bdf8;">[Prototype Link, Tokens & Heuristics]</span><br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; screens/<br>
+      &boxv;&nbsp;&nbsp; &boxur;&boxh;&boxh; HabitForge_Software_Design_Document_DA2.pdf &nbsp;<span style="color:#38bdf8;">[Generated 9-Page Design Document]</span><br>
+      &boxur;&boxh;&boxh; backend/src/main/java/com/example/HabitForge/ &nbsp;<span style="color:#38bdf8;">[Modular Java Spring Boot Codebase]</span><br>
+      &boxur;&boxh;&boxh; frontend/src/components/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#38bdf8;">[Modular React Components & Services]</span>
+    </div>
+
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Deliverable Item</th>
+          <th>Requirement Spec</th>
+          <th>Status / Repository Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Software Design Document</strong></td>
+          <td>PDF, 6&ndash;10 Pages Max</td>
+          <td><strong>Verified (9 Pages)</strong> &bull; Ready for Moodle upload</td>
+        </tr>
+        <tr>
+          <td><strong>Draw.io Editable Files</strong></td>
+          <td>.drawio XML format</td>
+          <td><code>docs/design/*.drawio</code> (Architecture, Component Flow, UML)</td>
+        </tr>
+        <tr>
+          <td><strong>Diagram PNG Exports</strong></td>
+          <td>High-res rendered PNGs</td>
+          <td><code>docs/design/*.png</code> (Clean vector-rendered diagrams)</td>
+        </tr>
+        <tr>
+          <td><strong>6 Figma Screen Designs</strong></td>
+          <td>Updated UI prototypes</td>
+          <td><code>docs/design/screens/screen[1-6].png</code> & <code>FIGMA_PROTOTYPE.md</code></td>
+        </tr>
+        <tr>
+          <td><strong>README.md Update</strong></td>
+          <td>Section "Software Design"</td>
+          <td>Updated with diagram embeds, summary, and 5 key decisions</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="running-footer">
+    <span>HabitForge &bull; Yashmit Sharma (24BAI1348) &bull; Software Engineering DA-2</span>
+    <span class="page-num">Page 9 of 9</span>
+  </div>
+</div>
+
+</body>
+</html>

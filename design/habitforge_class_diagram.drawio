@@ -1,0 +1,41 @@
+<mxfile host="app.diagrams.net" modified="2026-09-10T18:00:00.000Z" agent="HabitForge Design" version="24.7.5">
+  <diagram id="class-diag" name="HabitForge UML Class Diagram">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#0f172a" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Controller -->
+        <mxCell id="u_ctrl" value="HabitController&#xa;--------------------&#xa;- habitService: HabitService&#xa;--------------------&#xa;+ getHabits(): ResponseEntity&lt;List&lt;HabitResponseDto&gt;&gt;&#xa;+ completeHabit(id): ResponseEntity&lt;HabitResponseDto&gt;&#xa;+ createHabit(dto): ResponseEntity&lt;HabitResponseDto&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#1e293b;strokeColor=#38bdf8;fontColor=#f8fafc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="340" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- Service Interface -->
+        <mxCell id="u_serv_int" value="&lt;&lt;interface&gt;&gt; HabitService&#xa;--------------------&#xa;+ createHabit(userId, dto): HabitResponseDto&#xa;+ completeHabit(habitId, userId): HabitResponseDto&#xa;+ getUserHabits(userId): List&lt;HabitResponseDto&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#1e293b;strokeColor=#4ade80;fontColor=#f8fafc;" vertex="1" parent="1">
+          <mxGeometry x="500" y="80" width="320" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- Service Impl -->
+        <mxCell id="u_serv_impl" value="HabitServiceImpl&#xa;--------------------&#xa;- habitRepository: HabitRepository&#xa;- streakService: StreakCalculationService&#xa;- gamificationService: GamificationService&#xa;--------------------&#xa;+ createHabit(userId, dto): HabitResponseDto&#xa;+ completeHabit(habitId, userId): HabitResponseDto" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#1e293b;strokeColor=#4ade80;fontColor=#f8fafc;" vertex="1" parent="1">
+          <mxGeometry x="500" y="270" width="320" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- Strategy Interface -->
+        <mxCell id="u_strat_int" value="&lt;&lt;interface&gt;&gt; StreakStrategy&#xa;--------------------&#xa;+ calculateNewStreak(habit, date): int&#xa;+ isStreakBroken(habit, date): boolean" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#1e293b;strokeColor=#60a5fa;fontColor=#f8fafc;" vertex="1" parent="1">
+          <mxGeometry x="880" y="80" width="280" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Concrete Strategy -->
+        <mxCell id="u_strat_impl" value="DailyStreakStrategy&#xa;--------------------&#xa;+ calculateNewStreak(habit, date): int&#xa;+ isStreakBroken(habit, date): boolean" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#1e293b;strokeColor=#60a5fa;fontColor=#f8fafc;" vertex="1" parent="1">
+          <mxGeometry x="880" y="270" width="280" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Habit Model -->
+        <mxCell id="u_model" value="Habit (Domain Entity)&#xa;--------------------&#xa;- id: String&#xa;- userId: String&#xa;- title: String&#xa;- currentStreak: int&#xa;- xpReward: int&#xa;- hpPenalty: int&#xa;- completedToday: boolean&#xa;--------------------&#xa;+ isCompletedToday(): boolean" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#1e293b;strokeColor=#f59e0b;fontColor=#f8fafc;" vertex="1" parent="1">
+          <mxGeometry x="100" y="320" width="260" height="200" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

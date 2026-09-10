@@ -58,3 +58,69 @@ Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop)
 4. Access the application:
    * **Frontend Application:** `http://localhost:3000`
    * **Backend API (Spring Boot):** `http://localhost:8080`
+
+---
+
+## Software Design (DA-2 / Review 2)
+
+### Main Design Choices Summary
+HabitForge utilizes a **3-tier Layered Architecture** (Presentation, Application, and Persistence tiers) decoupled via stateless REST APIs and orchestrated through Docker Compose. High functional cohesion and low coupling are achieved across the Spring Boot backend by isolating HTTP controllers, domain business logic, and repository abstractions, with a pluggable Strategy Pattern for streak calculations. The React Vite frontend applies component-based modularity and strict service layer abstractions, delivering an RPG-style gamified experience with minimal cognitive load and instant dopamine feedback loops.
+
+---
+
+### 1. High-Level Architecture Diagram
+The system architecture follows a clean 3-tier model where the React client communicates with the Spring Boot server over RESTful HTTPS/JSON contracts, and data persistence is handled by MongoDB.
+
+![HabitForge High-Level Architecture](docs/design/habitforge_architecture.png)
+
+* **Editable Diagram Source:** [docs/design/habitforge_architecture.drawio](docs/design/habitforge_architecture.drawio)
+* **Architectural Style:** **Layered (3-Tier) Architecture with Client-Server RESTful Interaction**. Chosen because it enforces strict separation of concerns, enables independent scaling of frontend and backend services, simplifies automated testing, and allows future native mobile clients (React Native/Flutter) to reuse backend APIs seamlessly.
+
+---
+
+### 2. Component Modularity, Cohesion & Loose Coupling
+The application is organized into decoupled layers and focused services following the Single Responsibility Principle:
+
+![Component Flow & Data Modularity](docs/design/habitforge_component_flow.png)
+
+* **Editable Diagram Source:** [docs/design/habitforge_component_flow.drawio](docs/design/habitforge_component_flow.drawio)
+* **Design Principles Implemented:**
+  1. **Abstraction:** Defined through clear Java interfaces (HabitService, HabitRepository, StreakStrategy) and DTOs (HabitRequestDto, HabitResponseDto) that encapsulate domain representations.
+  2. **Modularity:** Separation of backend packages (controller, service, 
+epository, model, dto, strategy) and frontend components (QuestBoard, HeroStats, HabitCard, habitService).
+  3. **High Cohesion:** Dedicated single-responsibility classes—StreakCalculationService is strictly dedicated to streak evaluation, while GamificationService manages XP/HP calculations and leveling.
+  4. **Low Coupling:** Inversion of Control via Spring Constructor Dependency Injection, avoiding concrete class dependencies.
+
+---
+
+### 3. UML Class Diagram & Strategy Pattern
+The streak calculation logic is abstracted using the **Strategy Pattern**, allowing flexible streak evaluation rules (daily, weekly, holiday-exempt) without altering core habit services.
+
+![UML Class Diagram](docs/design/habitforge_class_diagram.png)
+
+* **Editable Diagram Source:** [docs/design/habitforge_class_diagram.drawio](docs/design/habitforge_class_diagram.drawio)
+
+---
+
+### 4. User Interface Design (6 Figma Screens)
+The user interface implements an RPG-gamified visual design system designed for low cognitive load and behavioral loss aversion:
+
+| Screen | File | Key UX Rationale |
+| :--- | :--- | :--- |
+| **1. Daily Quest Board** | [screen1_quest_board.png](docs/design/screens/screen1_quest_board.png) | Hero HP/XP gauges, time-of-day habit chunking (Morning/Afternoon/Evening), instant check-off feedback. |
+| **2. Quest Creator Modal** | [screen2_create_habit.png](docs/design/screens/screen2_create_habit.png) | Dynamic risk/reward tuning (Easy/Medium/Hard/Boss), category selectors, recurrence scheduling. |
+| **3. Hero Profile & RPG Stats** | [screen3_hero_profile.png](docs/design/screens/screen3_hero_profile.png) | Character sheet with avatar, discipline attributes (Strength, Intellect, Consistency), milestone badges. |
+| **4. Consistency Analytics** | [screen4_analytics_heatmap.png](docs/design/screens/screen4_analytics_heatmap.png) | 52-week GitHub-style activity heatmap, monthly completion rate bar charts, streak performance. |
+| **5. The Item Bazaar (Shop)** | [screen5_reward_shop.png](docs/design/screens/screen5_reward_shop.png) | Real-world guilt-free reward exchange (e.g., gaming, cheat meal) funded by earned habit gold. |
+| **6. Adventurer's Guild (Social)** | [screen6_guild_social.png](docs/design/screens/screen6_guild_social.png) | Cooperative Party Boss Raids, peer accountability activity stream, friend cheers (+5 XP). |
+
+* **Interactive Prototype Specification:** [docs/design/FIGMA_PROTOTYPE.md](docs/design/FIGMA_PROTOTYPE.md)
+
+---
+
+### 5. 5 Key Architectural Decisions & Why
+1. **React 18 Single-Page Application (SPA) vs Multi-Page MVC:** Enabled sub-second client-side route transitions and optimistic UI updates for habit completion, providing the responsiveness expected of a modern game.
+2. **Layered Spring Boot Architecture with DTOs:** Ensures strict boundaries between web controllers, business validation, and database persistence, preventing data leakage and facilitating unit testing.
+3. **Document-Oriented MongoDB Storage:** Habits and user logs feature variable attributes (custom categories, dynamic logs, badge lists) that naturally map to flexible JSON documents without complex SQL joins.
+4. **Server-Authoritative Midnight Cron Scheduler:** Prevents client-side tampering by centralizing health penalty deductions and streak resets on the backend server at midnight.
+5. **Stateless JWT Authentication:** Allows the application to scale horizontally in containerized cloud environments without maintaining sticky server-side sessions.

@@ -1,0 +1,65 @@
+<mxfile host="app.diagrams.net" modified="2026-09-10T18:00:00.000Z" agent="HabitForge Design" version="24.7.5">
+  <diagram id="arch-diag" name="HabitForge High-Level Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" background="#0f172a" math="0" shadow="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Docker Container Boundary -->
+        <mxCell id="box_docker" value="Docker Compose Orchestration Environment (Network: seproject_default)" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeColor=#38bdf8;strokeWidth=2;fillColor=#1e293b;fontColor=#94a3b8;verticalAlign=top;align=left;spacingLeft=15;spacingTop=10;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1120" height="720" as="geometry"/>
+        </mxCell>
+
+        <!-- Presentation Tier -->
+        <mxCell id="box_client" value="Client / Presentation Tier&#xa;React 18 + Vite (Port: 5173)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#0284c7;strokeWidth=2;fillColor=#0369a1;fontColor=#ffffff;verticalAlign=top;align=center;spacingTop=10;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="280" height="600" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_ui_comp" value="Modular UI Components&#xa;• QuestBoard.jsx&#xa;• HeroStats.jsx (HP/XP)&#xa;• HabitCard.jsx&#xa;• CreateQuestModal.jsx&#xa;• AnalyticsHeatmap.jsx&#xa;• RewardShop.jsx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0c4a6e;strokeColor=#38bdf8;fontColor=#f0f9ff;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="170" width="240" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_state" value="Client State &amp; Cache&#xa;• React Hooks (useState, useEffect)&#xa;• Optimistic UI Updates&#xa;• Local Theme Preference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0c4a6e;strokeColor=#38bdf8;fontColor=#f0f9ff;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="340" width="240" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_api_service" value="API Client Layer&#xa;• habitService.js&#xa;• Abstracted HTTP (Fetch/Axios)&#xa;• JWT Auth Token Interceptor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0c4a6e;strokeColor=#38bdf8;fontColor=#f0f9ff;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="470" width="240" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- REST API Bridge -->
+        <mxCell id="conn_rest" value="HTTPS / JSON&#xa;REST API calls&#xa;(Port 8080)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38bdf8;strokeWidth=3;fontColor=#38bdf8;fontSize=12;fontStyle=1;" edge="1" parent="1" source="c_api_service" target="box_server">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Application Tier -->
+        <mxCell id="box_server" value="Application Tier (Server)&#xa;Spring Boot REST API (Port: 8080)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#16a34a;strokeWidth=2;fillColor=#15803d;fontColor=#ffffff;verticalAlign=top;align=center;spacingTop=10;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="460" y="100" width="360" height="600" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_ctrl" value="REST Controllers&#xa;• HabitController (/api/habits)&#xa;• GamificationController (/api/gamification)&#xa;• AuthController (/api/auth)&#xa;• HealthCheck (/api/status)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#14532d;strokeColor=#4ade80;fontColor=#f0fdf4;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="160" width="320" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_service" value="Business Logic &amp; Domain Services&#xa;• HabitServiceImpl (implements HabitService)&#xa;• GamificationService (HP/XP/Levels)&#xa;• StreakCalculationService (Cohesion)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#14532d;strokeColor=#4ade80;fontColor=#f0fdf4;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="290" width="320" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_strategy" value="Strategy Pattern &amp; Schedulers&#xa;• StreakStrategy (DailyStreakStrategy)&#xa;• Midnight Cron Job (@Scheduled)&#xa;• DTO Mappers &amp; Validation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#14532d;strokeColor=#4ade80;fontColor=#f0fdf4;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="430" width="320" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_repo" value="Data Repositories (Abstraction)&#xa;• HabitRepository Interface&#xa;• UserRepository Interface&#xa;• Spring Data MongoDB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#14532d;strokeColor=#4ade80;fontColor=#f0fdf4;fontSize=12;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="560" width="320" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Database Bridge -->
+        <mxCell id="conn_db" value="TCP / Spring Data&#xa;Mongo Driver&#xa;(Port 27017)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4ade80;strokeWidth=3;fontColor=#4ade80;fontSize=12;fontStyle=1;" edge="1" parent="1" source="s_repo" target="box_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Data Persistence Tier -->
+        <mxCell id="box_db" value="Data Persistence Tier&#xa;MongoDB Document Database (Port: 27017)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#d97706;strokeWidth=2;fillColor=#b45309;fontColor=#ffffff;verticalAlign=top;align=center;spacingTop=10;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="900" y="100" width="220" height="600" as="geometry"/>
+        </mxCell>
+        <mxCell id="db_colls" value="NoSQL Collections&#xa;&#xa;• habits&#xa;• quest title, frequency, time&#xa;• current_streak, longest_streak&#xa;• xp_reward, hp_penalty&#xa;&#xa;• users&#xa;• credentials, profile avatar&#xa;• current_hp, max_hp, xp&#xa;• level, gold, unlocked_badges&#xa;&#xa;• daily_logs&#xa;• timestamps &amp; check-in history" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#78350f;strokeColor=#f59e0b;fontColor=#fef3c7;fontSize=12;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="920" y="180" width="180" height="490" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
